@@ -14,7 +14,7 @@ pub fn from_sql_derive(input: TokenStream) -> TokenStream {
         ident, attrs, data, ..
     } = parse_macro_input!(input as DeriveInput);
 
-    let (sql_type, variants) = parse_sql_type(attrs, data);
+    let (sql_type, variants) = parse_sql_type(attrs, data, "FromSqlDerive");
 
     let from_sql_arms = variants.iter().map(|Variant { ident, fields, .. }| {
         if let Fields::Unit = fields {
@@ -41,7 +41,41 @@ pub fn from_sql_derive(input: TokenStream) -> TokenStream {
     gen.into()
 }
 
-fn parse_sql_type(attrs: Vec<Attribute>, data: Data) -> (Ident, Punctuated<Variant, Comma>) {
+#[proc_macro_derive(ToSqlDerive, attributes(diesel))]
+pub fn to_sql_derive(input: TokenStream) -> TokenStream {
+    let DeriveInput {
+        ident, attrs, data, ..
+    } = parse_macro_input!(input as DeriveInput);
+
+    let (sql_type, variants) = parse_sql_type(attrs, data, "ToSqlDerive");
+
+    let to_sql_arms = variants.iter().map(|Variant { ident, .. }| {
+        let ident_str = format!("{}", ident);
+        let ident_bytes = ident_str.as_bytes();
+        let ident_bytes = syn::LitByteStr::new(ident_bytes, proc_macro2::Span::call_site());
+
+        quote! { Self::#ident => { out.write_all(#ident_bytes)?; } }
+    });
+
+    let gen = quote! {
+                impl diesel::serialize::ToSql<#sql_type, diesel::pg::Pg> for #ident {
+            fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b,'_, diesel::pg::Pg>) -> diesel::serialize::Result {
+                match *self {
+                    #(#to_sql_arms)*
+                }
+                Ok(diesel::serialize::IsNull::No)
+            }
+        }
+    };
+
+    gen.into()
+}
+
+fn parse_sql_type(
+    attrs: Vec<Attribute>,
+    data: Data,
+    kind: &str,
+) -> (Ident, Punctuated<Variant, Comma>) {
     let sql_type: Vec<Ident> = attrs
         .iter()
         .filter(|a| a.path().is_ident("diesel"))
@@ -69,7 +103,7 @@ fn parse_sql_type(attrs: Vec<Attribute>, data: Data) -> (Ident, Punctuated<Varia
     let variants = if let Data::Enum(data) = data {
         data.variants
     } else {
-        panic!("FromSqlDerive can only be derived for enums");
+        panic!("{} can only be derived for enums", kind);
     };
 
     (sql_type.to_owned(), variants)
