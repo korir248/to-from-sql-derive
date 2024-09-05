@@ -1,0 +1,22 @@
+[package]
+name = "from-sql-derive"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Eugene Korir"]
+keywords = ["Diesel", "FromSql"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+proc-macro2 = "1.0.67"
+quote = "1.0.33"
+syn = { version = "2.0.37", features = ["full"] }
+
+[lib]
+name = "from_sql_derive"
+path = "src/lib.rs"
+proc-macro = true
+
+[dev-dependencies]
+diesel = { version = "2.1", features = ["postgres", "chrono", "uuid"] }
