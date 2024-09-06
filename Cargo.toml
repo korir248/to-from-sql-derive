@@ -1,12 +1,12 @@
 [package]
 name = "diesel-enum-sqltype"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 authors = ["Eugene Korir"]
 keywords = ["diesel","postgres","enum"]
 description = "Provides derive macro for FromSql and ToSql traits for postgres enums"
-
+repository = "https://github.com/korir248/to-from-sql-derive"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
