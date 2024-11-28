@@ -17,7 +17,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-your_crate = { path = "path/to/macro/crate" }
+diesel-enum-sqltype = "0.1.5"
 diesel = { version = "x.x.x", features = ["postgres"] }
 ```
 
@@ -40,7 +40,7 @@ enum MyEnum {
 
 ## License
 
-[Choose an appropriate license]
+[MIT](LICENSE)
 
 ## Contributing
 
