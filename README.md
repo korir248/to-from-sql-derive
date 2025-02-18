@@ -17,7 +17,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-diesel-enum-sqltype = "0.1.5"
+diesel-enum-sqltype = "0.1.6"
 diesel = { version = "x.x.x", features = ["postgres"] }
 ```
 
@@ -25,11 +25,11 @@ diesel = { version = "x.x.x", features = ["postgres"] }
 
 ```rust
 #[derive(FromSqlDerive, ToSqlDerive)]
-#[diesel(sql_type = "YourCustomSqlType")]
-enum MyEnum {
-    Variant1,
-    Variant2,
-    Variant3,
+#[diesel(sql_type = "PaymentTypeT")] //imported from schema.rs
+enum PaymentType {
+    Card,
+    Bank,
+    Wire,
 }
 ```
 
